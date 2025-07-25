@@ -104,7 +104,7 @@
       </tr>
     </thead>
     <tbody id="productTableBody">
-      <!-- data produk -->
+      <!-- Data produk akan diisi lewat JavaScript -->
     </tbody>
   </table>
 
@@ -112,6 +112,7 @@
     const form = document.getElementById('productForm');
     const tbody = document.getElementById('productTableBody');
 
+    // Ambil data produk
     async function loadProducts() {
       const res = await fetch('api.php');
       const data = await res.json();
@@ -133,6 +134,7 @@
       });
     }
 
+    // Isi form dengan data produk (edit)
     function editProduct(product) {
       document.getElementById('productId').value = product.id;
       document.getElementById('name').value = product.name;
@@ -140,12 +142,24 @@
       document.getElementById('price').value = product.price;
     }
 
+    // Hapus produk
     async function deleteProduct(id) {
-      if (!confirm('Yakin hapus produk ini?')) return;
-      await fetch(`api.php?id=${id}`, { method: 'DELETE' });
+      if (!confirm('Yakin ingin menghapus produk ini?')) return;
+
+      const res = await fetch('api.php', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `id=${id}`
+      });
+
+      const result = await res.json();
+      alert(result.message || result.error || 'Gagal menghapus');
       loadProducts();
     }
 
+    // Tambah atau update produk
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       const formData = new FormData(form);
@@ -156,7 +170,7 @@
       });
 
       const result = await res.json();
-      alert(result.message || "Berhasil");
+      alert(result.message || result.error || 'Gagal simpan');
 
       form.reset();
       document.getElementById('productId').value = '';
